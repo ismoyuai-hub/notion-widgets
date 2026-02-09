@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notion 时间组件</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'SF Pro Display', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+        
+        /* 浅色模式默认样式 */
+        .notion-widget {
+            width: 100%;
+            max-width: 340px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        /* 深色模式适配 */
+        @media (prefers-color-scheme: dark) {
+            .notion-widget {
+                background-color: #2d2d2d;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            }
+            
+            .time-display {
+                color: #f2f2f2;
+            }
+            
+            .date-display {
+                color: #b3b3b3;
+            }
+            
+            .label {
+                color: #999;
+            }
+            
+            .value {
+                color: #ccc;
+            }
+            
+            .progress-bar-container {
+                background-color: #3d3d3d;
+            }
+            
+            .progress-bar {
+                background-color: #fff;
+            }
+            
+            .progress-percentage {
+                color: #ccc;
+            }
+        }
+        
+        /* 浅色模式样式 */
+        @media (prefers-color-scheme: light) {
+            .notion-widget {
+                background-color: #fff;
+            }
+            
+            .time-display {
+                color: #1a1a1a;
+            }
+            
+            .date-display {
+                color: #666;
+            }
+            
+            .label {
+                color: #555;
+            }
+            
+            .value {
+                color: #666;
+            }
+            
+            .progress-bar-container {
+                background-color: #e6e6e6;
+            }
+            
+            .progress-bar {
+                background-color: #000;
+            }
+            
+            .progress-percentage {
+                color: #666;
+            }
+        }
+        
+        .time-display {
+            font-size: 42px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 4px;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+        
+        .date-display {
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .progress-section {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        
+        .progress-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .progress-label {
+            display: flex;
+            flex-direction: column;
+            flex: 0 0 60px;
+        }
+        
+        .label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .value {
+            font-size: 11px;
+            font-weight: 400;
+        }
+        
+        .progress-bar-container {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(
+                to right,
+                transparent 0%,
+                currentColor 100%
+            );
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 0 0 70px;
+        }
+        
+        .progress-percentage {
+            font-size: 12px;
+            font-weight: 500;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="notion-widget">
+        <div class="time-display" id="timeDisplay">--:--:--</div>
+        <div class="date-display" id="dateDisplay">----</div>
+        
+        <div class="progress-section">
+            <div class="progress-item">
+                <div class="progress-label">
+                    <span class="label">YEAR</span>
+                    <span class="value" id="yearValue">--/365</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="yearProgress"></div>
+                </div>
+                <div class="progress-info">
+                    <span class="progress-percentage" id="yearPercentage">--%</span>
+                </div>
+            </div>
+            
+            <div class="progress-item">
+                <div class="progress-label">
+                    <span class="label">MONTH</span>
+                    <span class="value" id="monthValue">--/--</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="monthProgress"></div>
+                </div>
+                <div class="progress-info">
+                    <span class="progress-percentage" id="monthPercentage">--%</span>
+                </div>
+            </div>
+            
+            <div class="progress-item">
+                <div class="progress-label">
+                    <span class="label">WEEK</span>
+                    <span class="value" id="weekValue">--/7</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="weekProgress"></div>
+                </div>
+                <div class="progress-info">
+                    <span class="progress-percentage" id="weekPercentage">--%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 中文星期映射
+        const weekDaysCN = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+        // 英文星期映射
+        const weekDaysEN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        // 月份映射
+        const monthsCN = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+        
+        // 更新时间显示
+        function updateTime() {
+            const now = new Date();
+            
+            // 时间格式化
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            document.getElementById('timeDisplay').textContent = `${hours}:${minutes}:${seconds}`;
+            
+            // 日期格式化
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const date = now.getDate();
+            const dayOfWeek = now.getDay();
+            const dayNameCN = weekDaysCN[dayOfWeek];
+            const dayNameEN = weekDaysEN[dayOfWeek];
+            const monthNameCN = monthsCN[now.getMonth()];
+            
+            document.getElementById('dateDisplay').textContent = 
+                `${year}年${month}月${date}日 ${dayNameCN} | ${dayNameEN}`;
+            
+            // 计算进度
+            updateProgress(now);
+        }
+        
+        // 更新进度条
+        function updateProgress(now) {
+            const year = now.getFullYear();
+            const month = now.getMonth(); // 0-11
+            const date = now.getDate(); // 1-31
+            const dayOfWeek = now.getDay(); // 0-6 (周日-周六)
+            
+            // === Year 进度 ===
+            const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+            const daysInYear = isLeapYear ? 366 : 365;
+            const dayOfYear = getDayOfYear(now);
+            const yearProgress = (dayOfYear / daysInYear) * 100;
+            const yearPercentage = Math.round(yearProgress);
+            
+            document.getElementById('yearProgress').style.width = `${yearProgress}%`;
+            document.getElementById('yearValue').textContent = `${dayOfYear}/${daysInYear}`;
+            document.getElementById('yearPercentage').textContent = `${yearPercentage}%`;
+            
+            // === Month 进度 ===
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const monthProgress = (date / daysInMonth) * 100;
+            const monthPercentage = Math.round(monthProgress);
+            
+            document.getElementById('monthProgress').style.width = `${monthProgress}%`;
+            document.getElementById('monthValue').textContent = `${date}/${daysInMonth}`;
+            document.getElementById('monthPercentage').textContent = `${monthPercentage}%`;
+            
+            // === Week 进度 ===
+            // Notion 的周从周一开始，周日为第7天
+            const weekDay = dayOfWeek === 0 ? 7 : dayOfWeek; // 周日=7, 周一=1
+            const weekProgress = (weekDay / 7) * 100;
+            const weekPercentage = Math.round(weekProgress);
+            
+            document.getElementById('weekProgress').style.width = `${weekProgress}%`;
+            document.getElementById('weekValue').textContent = `${weekDay}/7`;
+            document.getElementById('weekPercentage').textContent = `${weekPercentage}%`;
+        }
+        
+        // 计算一年中的第几天
+        function getDayOfYear(date) {
+            const start = new Date(date.getFullYear(), 0, 0);
+            const diff = date - start;
+            const oneDay = 1000 * 60 * 60 * 24;
+            return Math.floor(diff / oneDay);
+        }
+        
+        // 初始化并开始定时更新
+        updateTime();
+        setInterval(updateTime, 1000);
+        
+        // 页面可见性优化
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                updateTime();
+            }
+        });
+    </script>
+</body>
+</html>
