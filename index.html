@@ -1,320 +1,367 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notion 时间组件</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'SF Pro Display', Roboto, 'Helvetica Neue', sans-serif;
-        }
-        
-        body {
-            background: #1a1a1a;
-            color: #e0e0e0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-        }
-        
-        /* Notion 深色主题适配 */
-        .notion-widget {
-            width: 100%;
-            max-width: 320px;
-            padding: 24px;
-            border-radius: 12px;
-            background: #1e1e1e;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            border: 1px solid #2d2d2d;
-            overflow: hidden;
-        }
-        
-        /* 日期标题样式 */
-        .date-header {
-            text-align: center;
-            margin-bottom: 18px;
-            font-size: 12px;
-            color: #8a8a8a;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-        
-        /* 时间显示样式 */
-        .time-display {
-            font-size: 46px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 22px;
-            line-height: 1.1;
-            letter-spacing: -0.8px;
-            color: #ffffff;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-        }
-        
-        /* 进度条区域 */
-        .progress-section {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .progress-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .progress-label {
-            flex: 0 0 60px;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #a0a0a0;
-            margin-bottom: 4px;
-            letter-spacing: 0.2px;
-        }
-        
-        .value {
-            font-size: 12px;
-            color: #7a7a7a;
-            font-weight: 500;
-        }
-        
-        .progress-bar-container {
-            flex: 1;
-            height: 10px;
-            background-color: #2d2d2d;
-            border-radius: 5px;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            border-radius: 5px;
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            background: linear-gradient(90deg, #00c896 0%, #00a884 100%);
-            box-shadow: 0 0 8px rgba(0, 200, 150, 0.3);
-        }
-        
-        .progress-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            width: 4px;
-            background: linear-gradient(
-                to right,
-                transparent 0%,
-                rgba(255, 255, 255, 0.8) 100%
-            );
-        }
-        
-        .progress-info {
-            flex: 0 0 50px;
-            text-align: right;
-            font-size: 12px;
-            font-weight: 500;
-            color: #a0a0a0;
-            letter-spacing: 0.2px;
-        }
-        
-        /* 日期格式优化 */
-        .date-format {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            margin-top: 8px;
-            font-size: 12px;
-            color: #8a8a8a;
-        }
-        
-        .date-divider {
-            width: 4px;
-            height: 4px;
-            background: #5a5a5a;
-            border-radius: 50%;
-        }
-        
-        /* 额外的视觉效果 */
-        .notion-widget::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #00c896, transparent);
-        }
-        
-        .notion-widget::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #00c896, transparent);
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Notion 时间组件</title>
+  <style>
+    /* ========== 全局重置 ========== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html,body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, "SF Pro Display", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      background: transparent; /* 让 Notion 的背景可见（如果是 iframe 嵌入，外层背景会生效） */
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding: 12px;
+    }
+
+    /* ========== 主题变量（默认：深色） ========== */
+    :root {
+      --bg: #121314;
+      --card-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12));
+      --muted: #8f9296;
+      --muted-2: #6f7376;
+      --text: #f7f8f8;
+      --accent-start: #00d0a3;
+      --accent-end: #00a884;
+      --accent-glow: rgba(0,208,163,0.16);
+      --edge: rgba(255,255,255,0.03);
+      --shadow: 0 8px 26px rgba(0,0,0,0.55);
+    }
+
+    /* 浅色主题覆盖（会在 JS 中添加 body.light） */
+    body.light {
+      --bg: #fff;
+      --card-bg: linear-gradient(180deg, rgba(0,0,0,0.02), rgba(255,255,255,0.98));
+      --muted: #6b7177;
+      --muted-2: #9aa0a6;
+      --text: #111213;
+      --accent-start: #00a884;
+      --accent-end: #008f6f;
+      --accent-glow: rgba(0,168,132,0.08);
+      --edge: rgba(0,0,0,0.06);
+      --shadow: 0 10px 30px rgba(15,15,15,0.06);
+    }
+
+    /* 还支持系统偏好（在没有 URL 强制时作为默认） */
+    @media (prefers-color-scheme: light) {
+      :root { /* keep root defs — JS will respect media when theme=auto */ }
+    }
+
+    /* ========== 小卡片布局 ========== */
+    .widget-wrap {
+      width: 100%;
+      max-width: 320px;
+      position: relative;
+    }
+
+    .notion-widget {
+      position: relative;
+      border-radius: 14px;
+      padding: 22px;
+      background: var(--card-bg);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--edge);
+      overflow: hidden;
+      transform-origin: center;
+    }
+
+    /* subtle gradient edge lines */
+    .notion-widget::before,
+    .notion-widget::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0;
+      height: 2px;
+      pointer-events: none;
+      opacity: 0.95;
+      background: linear-gradient(90deg, transparent, var(--accent-start), transparent);
+      mix-blend-mode: overlay;
+    }
+    .notion-widget::before { top: 6px; }
+    .notion-widget::after  { bottom: 6px; }
+
+    /* 标题/时间 */
+    .date-header {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      margin-bottom: 10px;
+    }
+    .time-display {
+      font-size: 44px;
+      font-weight: 800;
+      text-align: center;
+      line-height: 1;
+      letter-spacing: -1px;
+      color: var(--text);
+      margin-bottom: 18px;
+      text-shadow: 0 2px 6px var(--accent-glow);
+    }
+
+    /* 进度区域 */
+    .progress-section { display:flex; flex-direction: column; gap: 14px; }
+    .progress-item { display:flex; align-items:center; gap:12px; }
+    .progress-label { flex:0 0 64px; display:flex; flex-direction:column; }
+    .label {
+      font-size: 12px;
+      font-weight:700;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .value {
+      font-size: 12px;
+      color: var(--muted-2);
+      font-weight:600;
+    }
+
+    .progress-bar-container {
+      flex:1;
+      height: 10px;
+      background: rgba(0,0,0,0.12);
+      border-radius: 999px;
+      overflow:hidden;
+      position:relative;
+      border: 1px solid rgba(255,255,255,0.02);
+      backdrop-filter: blur(2px);
+    }
+    .progress-bar {
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      transition: width 700ms cubic-bezier(.22,.9,.36,1);
+      background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+      box-shadow: 0 6px 18px var(--accent-glow);
+      position:relative;
+    }
+    .progress-info {
+      flex:0 0 46px;
+      text-align:right;
+      font-size:12px;
+      font-weight:700;
+      color:var(--muted);
+    }
+
+    /* 底部日期显示 */
+    .date-format {
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:8px;
+      margin-top:14px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .date-divider { width:4px; height:4px; border-radius:50%; background:var(--muted-2); }
+
+    /* ========== 响应式与嵌入适配 ========== */
+    @media (max-width: 360px) {
+      .time-display { font-size: 34px; }
+      .notion-widget { padding: 16px; border-radius: 12px; }
+    }
+
+    /* 当 Notion embed 区域很小（比如行内）时自适应缩放 */
+    .scale-down {
+      transform: scale(var(--scale,1));
+      transform-origin: center top;
+    }
+  </style>
 </head>
 <body>
-    <div class="notion-widget">
-        <div class="date-header" id="dateHeader">2026年2月9日 周一 | Monday</div>
-        <div class="time-display" id="timeDisplay">--:--:--</div>
-        
-        <div class="progress-section">
-            <div class="progress-item">
-                <div class="progress-label">
-                    <span class="label">YEAR</span>
-                    <span class="value" id="yearValue">--/365</span>
-                </div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar" id="yearProgress"></div>
-                </div>
-                <div class="progress-info" id="yearPercentage">--%</div>
-            </div>
-            
-            <div class="progress-item">
-                <div class="progress-label">
-                    <span class="label">MONTH</span>
-                    <span class="value" id="monthValue">--/--</span>
-                </div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar" id="monthProgress"></div>
-                </div>
-                <div class="progress-info" id="monthPercentage">--%</div>
-            </div>
-            
-            <div class="progress-item">
-                <div class="progress-label">
-                    <span class="label">WEEK</span>
-                    <span class="value" id="weekValue">--/7</span>
-                </div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar" id="weekProgress"></div>
-                </div>
-                <div class="progress-info" id="weekPercentage">--%</div>
-            </div>
-        </div>
-        
-        <div class="date-format">
-            <span id="yearLabel">2026</span>
-            <span class="date-divider"></span>
-            <span id="monthLabel">02</span>
-            <span class="date-divider"></span>
-            <span id="dayLabel">09</span>
-            <span class="date-divider"></span>
-            <span id="dayOfWeekLabel">周一</span>
-        </div>
-    </div>
+  <div class="widget-wrap">
+    <div class="notion-widget scale-down" id="widget">
+      <div class="date-header" id="dateHeader">--</div>
+      <div class="time-display" id="timeDisplay">--:--:--</div>
 
-    <script>
-        // 中文星期映射
-        const weekDaysCN = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-        // 英文星期映射
-        const weekDaysEN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        // 月份映射
-        const monthsCN = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-        
-        // 更新时间显示
-        function updateTime() {
-            const now = new Date();
-            
-            // 时间格式化
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const seconds = now.getSeconds().toString().padStart(2, '0');
-            document.getElementById('timeDisplay').textContent = `${hours}:${minutes}:${seconds}`;
-            
-            // 日期格式化
-            const year = now.getFullYear();
-            const month = now.getMonth() + 1;
-            const date = now.getDate();
-            const dayOfWeek = now.getDay();
-            
-            // 更新日期标题
-            document.getElementById('dateHeader').textContent = 
-                `${year}年${month.toString().padStart(2, '0')}月${date.toString().padStart(2, '0')}日 ${weekDaysCN[dayOfWeek]} | ${weekDaysEN[dayOfWeek]}`;
-            
-            // 更新底部日期格式
-            document.getElementById('yearLabel').textContent = year;
-            document.getElementById('monthLabel').textContent = month.toString().padStart(2, '0');
-            document.getElementById('dayLabel').textContent = date.toString().padStart(2, '0');
-            document.getElementById('dayOfWeekLabel').textContent = weekDaysCN[dayOfWeek];
-            
-            // 计算进度
-            updateProgress(now);
-        }
-        
-        // 更新进度条
-        function updateProgress(now) {
-            const year = now.getFullYear();
-            const month = now.getMonth(); // 0-11
-            const date = now.getDate(); // 1-31
-            const dayOfWeek = now.getDay(); // 0-6 (周日-周六)
-            
-            // === Year 进度 ===
-            const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
-            const daysInYear = isLeapYear ? 366 : 365;
-            const dayOfYear = getDayOfYear(now);
-            const yearProgress = (dayOfYear / daysInYear) * 100;
-            const yearPercentage = Math.round(yearProgress);
-            
-            document.getElementById('yearProgress').style.width = `${yearProgress}%`;
-            document.getElementById('yearValue').textContent = `${dayOfYear}/${daysInYear}`;
-            document.getElementById('yearPercentage').textContent = `${yearPercentage}%`;
-            
-            // === Month 进度 ===
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const monthProgress = (date / daysInMonth) * 100;
-            const monthPercentage = Math.round(monthProgress);
-            
-            document.getElementById('monthProgress').style.width = `${monthProgress}%`;
-            document.getElementById('monthValue').textContent = `${date}/${daysInMonth}`;
-            document.getElementById('monthPercentage').textContent = `${monthPercentage}%`;
-            
-            // === Week 进度 ===
-            // Notion 的周从周一开始，周日为第7天
-            const weekDay = dayOfWeek === 0 ? 7 : dayOfWeek; // 周日=7, 周一=1
-            const weekProgress = (weekDay / 7) * 100;
-            const weekPercentage = Math.round(weekProgress);
-            
-            document.getElementById('weekProgress').style.width = `${weekProgress}%`;
-            document.getElementById('weekValue').textContent = `${weekDay}/7`;
-            document.getElementById('weekPercentage').textContent = `${weekPercentage}%`;
-        }
-        
-        // 计算一年中的第几天
-        function getDayOfYear(date) {
-            const start = new Date(date.getFullYear(), 0, 0);
-            const diff = date - start;
-            const oneDay = 1000 * 60 * 60 * 24;
-            return Math.floor(diff / oneDay);
-        }
-        
-        // 初始化并开始定时更新
-        updateTime();
-        setInterval(updateTime, 1000);
-        
-        // 页面可见性优化
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
-                updateTime();
-            }
-        });
-    </script>
+      <div class="progress-section">
+        <div class="progress-item">
+          <div class="progress-label">
+            <span class="label">YEAR</span>
+            <span class="value" id="yearValue">--/365</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="yearProgress"></div>
+          </div>
+          <div class="progress-info" id="yearPercentage">--%</div>
+        </div>
+
+        <div class="progress-item">
+          <div class="progress-label">
+            <span class="label">MONTH</span>
+            <span class="value" id="monthValue">--/--</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="monthProgress"></div>
+          </div>
+          <div class="progress-info" id="monthPercentage">--%</div>
+        </div>
+
+        <div class="progress-item">
+          <div class="progress-label">
+            <span class="label">WEEK</span>
+            <span class="value" id="weekValue">--/7</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="weekProgress"></div>
+          </div>
+          <div class="progress-info" id="weekPercentage">--%</div>
+        </div>
+      </div>
+
+      <div class="date-format">
+        <span id="yearLabel">----</span>
+        <span class="date-divider"></span>
+        <span id="monthLabel">--</span>
+        <span class="date-divider"></span>
+        <span id="dayLabel">--</span>
+        <span class="date-divider"></span>
+        <span id="dayOfWeekLabel">--</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 映射
+    const weekDaysCN = ['周日','周一','周二','周三','周四','周五','周六'];
+    const weekDaysEN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+    // ----- 主题检测与应用 -----
+    // 优先级：URL 参数 theme=dark|light|auto > 系统 prefers-color-scheme (当 theme=auto 或无参数)
+    function getUrlTheme() {
+      try {
+        const params = new URLSearchParams(window.location.search || '');
+        const t = params.get('theme');
+        if (!t) return null;
+        const v = t.toLowerCase();
+        if (['dark','light','auto'].includes(v)) return v;
+      } catch (e) { }
+      return null;
+    }
+
+    function applyTheme(theme) {
+      // theme: 'dark'|'light'|'auto'
+      if (theme === 'light') {
+        document.body.classList.add('light');
+      } else if (theme === 'dark') {
+        document.body.classList.remove('light');
+      } else {
+        // auto: 根据系统偏好
+        const isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        if (isLight) document.body.classList.add('light'); else document.body.classList.remove('light');
+      }
+    }
+
+    // 读取 URL 强制主题或使用 auto
+    const forced = getUrlTheme();
+    applyTheme(forced || 'auto');
+
+    // 如果是 auto 或无参数，监听系统偏好变化
+    if (!forced || forced === 'auto') {
+      if (window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: light)');
+        mq.addEventListener ? mq.addEventListener('change', () => applyTheme('auto')) : mq.addListener(() => applyTheme('auto'));
+      }
+    }
+
+    // 另外，如果你希望从 Notion 父页面接收 postMessage 指令（高级），可以监听：
+    // window.addEventListener('message', e => {
+    //   if (e.data && e.data.notionTheme) applyTheme(e.data.notionTheme);
+    // });
+
+    // ----- 时间与进度计算 -----
+    function pad(n){ return n.toString().padStart(2,'0'); }
+    function getDayOfYear(date) {
+      const start = new Date(date.getFullYear(),0,0);
+      const diff = date - start;
+      const oneDay = 1000*60*60*24;
+      return Math.floor(diff/oneDay);
+    }
+
+    function updateProgress(now) {
+      const year = now.getFullYear();
+      const month = now.getMonth(); // 0-11
+      const date = now.getDate();
+      const dayOfWeek = now.getDay(); // 0-6 (Sun-Sat)
+
+      // Year
+      const isLeap = (year%4===0 && year%100!==0) || (year%400===0);
+      const daysInYear = isLeap ? 366 : 365;
+      const dayOfYear = getDayOfYear(now);
+      const yearPercent = Math.min(100, (dayOfYear / daysInYear) * 100);
+      document.getElementById('yearProgress').style.width = `${yearPercent}%`;
+      document.getElementById('yearValue').textContent = `${dayOfYear}/${daysInYear}`;
+      document.getElementById('yearPercentage').textContent = `${Math.round(yearPercent)}%`;
+
+      // Month
+      const daysInMonth = new Date(year, month+1, 0).getDate();
+      const monthPercent = Math.min(100, (date / daysInMonth) * 100);
+      document.getElementById('monthProgress').style.width = `${monthPercent}%`;
+      document.getElementById('monthValue').textContent = `${date}/${daysInMonth}`;
+      document.getElementById('monthPercentage').textContent = `${Math.round(monthPercent)}%`;
+
+      // Week (Notion 周从周一开始，周日作为第7天)
+      const notionWeekDay = dayOfWeek === 0 ? 7 : dayOfWeek; // Sunday -> 7
+      const weekPercent = Math.min(100, (notionWeekDay / 7) * 100);
+      document.getElementById('weekProgress').style.width = `${weekPercent}%`;
+      document.getElementById('weekValue').textContent = `${notionWeekDay}/7`;
+      document.getElementById('weekPercentage').textContent = `${Math.round(weekPercent)}%`;
+    }
+
+    function updateTime() {
+      const now = new Date();
+      const hh = pad(now.getHours()), mm = pad(now.getMinutes()), ss = pad(now.getSeconds());
+      document.getElementById('timeDisplay').textContent = `${hh}:${mm}:${ss}`;
+
+      const year = now.getFullYear(), month = pad(now.getMonth()+1), date = pad(now.getDate());
+      const wcn = weekDaysCN[now.getDay()], wen = weekDaysEN[now.getDay()];
+      document.getElementById('dateHeader').textContent = `${year}年${month}月${date}日 ${wcn} | ${wen}`;
+      document.getElementById('yearLabel').textContent = year;
+      document.getElementById('monthLabel').textContent = month;
+      document.getElementById('dayLabel').textContent = date;
+      document.getElementById('dayOfWeekLabel').textContent = wcn;
+
+      updateProgress(now);
+    }
+
+    // 节能优化：可见时更新，隐藏时暂停（避免在嵌入页面造成性能压力）
+    let timer = null;
+    function startTicker() {
+      updateTime();
+      if (timer) clearInterval(timer);
+      timer = setInterval(updateTime, 1000);
+    }
+    function stopTicker() { if (timer) clearInterval(timer); timer = null; }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') startTicker(); else stopTicker();
+    });
+
+    // 启动
+    startTicker();
+
+    // ----- 可选：在非常小的嵌入框中自动缩放（如果父容器宽度有限，调整 scale） -----
+    // 逻辑：当 widget-wrap 宽度小于设计宽度时按比例缩放
+    (function adaptiveScale() {
+      const wrap = document.querySelector('.widget-wrap');
+      const widget = document.getElementById('widget');
+      function doScale() {
+        try {
+          const parentW = wrap.clientWidth || document.documentElement.clientWidth;
+          const designW = 320;
+          const scale = Math.min(1, parentW / designW);
+          widget.style.setProperty('--scale', scale.toString());
+        } catch(e) {}
+      }
+      window.addEventListener('resize', doScale);
+      doScale();
+    })();
+  </script>
 </body>
 </html>
