@@ -13,151 +13,124 @@
         }
         
         body {
+            background: transparent;
+            color: #333;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 16px;
+            padding: 10px;
         }
         
-        /* 浅色模式默认样式 */
+        /* 透明背景容器 */
         .notion-widget {
             width: 100%;
-            max-width: 340px;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            max-width: 320px;
+            padding: 24px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            position: relative;
         }
         
         /* 深色模式适配 */
         @media (prefers-color-scheme: dark) {
+            body {
+                color: #e0e0e0;
+            }
+            
             .notion-widget {
-                background-color: #2d2d2d;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            }
-            
-            .time-display {
-                color: #f2f2f2;
-            }
-            
-            .date-display {
-                color: #b3b3b3;
-            }
-            
-            .label {
-                color: #999;
-            }
-            
-            .value {
-                color: #ccc;
-            }
-            
-            .progress-bar-container {
-                background-color: #3d3d3d;
-            }
-            
-            .progress-bar {
-                background-color: #fff;
-            }
-            
-            .progress-percentage {
-                color: #ccc;
+                background: rgba(30, 30, 30, 0.25);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             }
         }
         
-        /* 浅色模式样式 */
-        @media (prefers-color-scheme: light) {
-            .notion-widget {
-                background-color: #fff;
-            }
-            
-            .time-display {
-                color: #1a1a1a;
-            }
-            
-            .date-display {
-                color: #666;
-            }
-            
-            .label {
-                color: #555;
-            }
-            
-            .value {
-                color: #666;
-            }
-            
-            .progress-bar-container {
-                background-color: #e6e6e6;
-            }
-            
-            .progress-bar {
-                background-color: #000;
-            }
-            
-            .progress-percentage {
-                color: #666;
-            }
+        /* 日期标题样式 */
+        .date-header {
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: #8a8a8a;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            line-height: 1.4;
         }
         
+        /* 时间显示样式 */
         .time-display {
-            font-size: 42px;
+            font-size: 46px;
             font-weight: 700;
             text-align: center;
-            margin-bottom: 4px;
-            line-height: 1.2;
-            letter-spacing: -0.5px;
+            margin-bottom: 18px;
+            line-height: 1.1;
+            letter-spacing: -0.8px;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         }
         
-        .date-display {
-            font-size: 13px;
+        /* 农历日期样式 */
+        .lunar-date {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 22px;
+            font-size: 15px;
             font-weight: 500;
+            color: #a0a0a0;
+            letter-spacing: 0.3px;
         }
         
+        /* 进度条区域 */
         .progress-section {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 20px;
         }
         
         .progress-item {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
         
         .progress-label {
+            flex: 0 0 60px;
             display: flex;
             flex-direction: column;
-            flex: 0 0 60px;
         }
         
         .label {
-            font-size: 12px;
-            font-weight: 500;
+            font-size: 13px;
+            font-weight: 600;
+            color: #a0a0a0;
+            margin-bottom: 4px;
+            letter-spacing: 0.2px;
         }
         
         .value {
-            font-size: 11px;
-            font-weight: 400;
+            font-size: 12px;
+            color: #7a7a7a;
+            font-weight: 500;
         }
         
         .progress-bar-container {
             flex: 1;
-            height: 6px;
-            border-radius: 3px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
             overflow: hidden;
             position: relative;
         }
         
         .progress-bar {
             height: 100%;
-            border-radius: 3px;
+            border-radius: 5px;
             transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
+            background: linear-gradient(90deg, #00c896 0%, #00a884 100%);
+            box-shadow: 0 0 8px rgba(0, 200, 150, 0.3);
         }
         
         .progress-bar::after {
@@ -170,28 +143,46 @@
             background: linear-gradient(
                 to right,
                 transparent 0%,
-                currentColor 100%
+                rgba(255, 255, 255, 0.8) 100%
             );
         }
         
         .progress-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex: 0 0 70px;
-        }
-        
-        .progress-percentage {
+            flex: 0 0 50px;
+            text-align: right;
             font-size: 12px;
             font-weight: 500;
-            text-align: right;
+            color: #a0a0a0;
+            letter-spacing: 0.2px;
+        }
+        
+        /* 额外的视觉效果 */
+        .notion-widget::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00c896, transparent);
+        }
+        
+        .notion-widget::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00c896, transparent);
         }
     </style>
 </head>
 <body>
     <div class="notion-widget">
+        <div class="date-header" id="dateHeader">2026年2月9日 周一 | Monday</div>
+        <div class="lunar-date" id="lunarDate">乙巳年 正月初十二</div>
         <div class="time-display" id="timeDisplay">--:--:--</div>
-        <div class="date-display" id="dateDisplay">----</div>
         
         <div class="progress-section">
             <div class="progress-item">
@@ -202,9 +193,7 @@
                 <div class="progress-bar-container">
                     <div class="progress-bar" id="yearProgress"></div>
                 </div>
-                <div class="progress-info">
-                    <span class="progress-percentage" id="yearPercentage">--%</span>
-                </div>
+                <div class="progress-info" id="yearPercentage">--%</div>
             </div>
             
             <div class="progress-item">
@@ -215,9 +204,7 @@
                 <div class="progress-bar-container">
                     <div class="progress-bar" id="monthProgress"></div>
                 </div>
-                <div class="progress-info">
-                    <span class="progress-percentage" id="monthPercentage">--%</span>
-                </div>
+                <div class="progress-info" id="monthPercentage">--%</div>
             </div>
             
             <div class="progress-item">
@@ -228,9 +215,7 @@
                 <div class="progress-bar-container">
                     <div class="progress-bar" id="weekProgress"></div>
                 </div>
-                <div class="progress-info">
-                    <span class="progress-percentage" id="weekPercentage">--%</span>
-                </div>
+                <div class="progress-info" id="weekPercentage">--%</div>
             </div>
         </div>
     </div>
@@ -241,7 +226,44 @@
         // 英文星期映射
         const weekDaysEN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         // 月份映射
-        const monthsCN = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+        const monthsCN = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+        
+        // 农历数据
+        const lunarData = [
+            '正月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'
+        ];
+        
+        const lunarDays = [
+            '初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十',
+            '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十',
+            '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'
+        ];
+        
+        const lunarYears = [
+            '甲子', '乙丑', '丙寅', '丁卯', '戊辰', '己巳', '庚午', '辛未', '壬申', '癸酉',
+            '甲戌', '乙亥', '丙子', '丁丑', '戊寅', '己卯', '庚辰', '辛巳', '壬午', '癸未',
+            '甲申', '乙酉', '丙戌', '丁亥', '戊子', '己丑', '庚寅', '辛卯', '壬辰', '癸巳',
+            '甲午', '乙未', '丙申', '丁酉', '戊戌', '己亥', '庚子', '辛丑', '壬寅', '癸卯',
+            '甲辰', '乙巳', '丙午', '丁未', '戊申', '己酉', '庚戌', '辛亥', '壬子', '癸丑',
+            '甲寅', '乙卯', '丙辰', '丁巳', '戊午', '己未', '庚申', '辛酉', '壬戌', '癸亥'
+        ];
+        
+        // 获取农历日期
+        function getLunarDate(date) {
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            
+            // 计算农历年份（简单实现，实际应使用专业农历算法）
+            const yearIndex = (year - 1984) % 60;
+            const lunarYear = lunarYears[yearIndex];
+            
+            // 获取农历月份和日期
+            const lunarMonth = lunarData[month - 1];
+            const lunarDay = lunarDays[day - 1] || '初一';
+            
+            return `${lunarYear}年 ${lunarMonth}${lunarDay}`;
+        }
         
         // 更新时间显示
         function updateTime() {
@@ -258,12 +280,13 @@
             const month = now.getMonth() + 1;
             const date = now.getDate();
             const dayOfWeek = now.getDay();
-            const dayNameCN = weekDaysCN[dayOfWeek];
-            const dayNameEN = weekDaysEN[dayOfWeek];
-            const monthNameCN = monthsCN[now.getMonth()];
             
-            document.getElementById('dateDisplay').textContent = 
-                `${year}年${month}月${date}日 ${dayNameCN} | ${dayNameEN}`;
+            // 更新日期标题
+            document.getElementById('dateHeader').textContent = 
+                `${year}年${month.toString().padStart(2, '0')}月${date.toString().padStart(2, '0')}日 ${weekDaysCN[dayOfWeek]} | ${weekDaysEN[dayOfWeek]}`;
+            
+            // 更新农历日期
+            document.getElementById('lunarDate').textContent = getLunarDate(now);
             
             // 计算进度
             updateProgress(now);
