@@ -13,8 +13,8 @@
         }
         
         body {
-            background: transparent;
-            color: #333;
+            background: #1a1a1a;
+            color: #e0e0e0;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -22,42 +22,26 @@
             padding: 10px;
         }
         
-        /* 透明背景容器 */
+        /* Notion 深色主题适配 */
         .notion-widget {
             width: 100%;
             max-width: 320px;
             padding: 24px;
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #1e1e1e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border: 1px solid #2d2d2d;
             overflow: hidden;
-            position: relative;
-        }
-        
-        /* 深色模式适配 */
-        @media (prefers-color-scheme: dark) {
-            body {
-                color: #e0e0e0;
-            }
-            
-            .notion-widget {
-                background: rgba(30, 30, 30, 0.25);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            }
         }
         
         /* 日期标题样式 */
         .date-header {
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: 18px;
             font-size: 12px;
             color: #8a8a8a;
             font-weight: 500;
             letter-spacing: 0.5px;
-            line-height: 1.4;
         }
         
         /* 时间显示样式 */
@@ -65,21 +49,11 @@
             font-size: 46px;
             font-weight: 700;
             text-align: center;
-            margin-bottom: 18px;
+            margin-bottom: 22px;
             line-height: 1.1;
             letter-spacing: -0.8px;
             color: #ffffff;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* 农历日期样式 */
-        .lunar-date {
-            text-align: center;
-            margin-bottom: 22px;
-            font-size: 15px;
-            font-weight: 500;
-            color: #a0a0a0;
-            letter-spacing: 0.3px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
         
         /* 进度条区域 */
@@ -118,7 +92,7 @@
         .progress-bar-container {
             flex: 1;
             height: 10px;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: #2d2d2d;
             border-radius: 5px;
             overflow: hidden;
             position: relative;
@@ -156,6 +130,24 @@
             letter-spacing: 0.2px;
         }
         
+        /* 日期格式优化 */
+        .date-format {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #8a8a8a;
+        }
+        
+        .date-divider {
+            width: 4px;
+            height: 4px;
+            background: #5a5a5a;
+            border-radius: 50%;
+        }
+        
         /* 额外的视觉效果 */
         .notion-widget::before {
             content: '';
@@ -181,7 +173,6 @@
 <body>
     <div class="notion-widget">
         <div class="date-header" id="dateHeader">2026年2月9日 周一 | Monday</div>
-        <div class="lunar-date" id="lunarDate">乙巳年 正月初十二</div>
         <div class="time-display" id="timeDisplay">--:--:--</div>
         
         <div class="progress-section">
@@ -218,6 +209,16 @@
                 <div class="progress-info" id="weekPercentage">--%</div>
             </div>
         </div>
+        
+        <div class="date-format">
+            <span id="yearLabel">2026</span>
+            <span class="date-divider"></span>
+            <span id="monthLabel">02</span>
+            <span class="date-divider"></span>
+            <span id="dayLabel">09</span>
+            <span class="date-divider"></span>
+            <span id="dayOfWeekLabel">周一</span>
+        </div>
     </div>
 
     <script>
@@ -227,43 +228,6 @@
         const weekDaysEN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         // 月份映射
         const monthsCN = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-        
-        // 农历数据
-        const lunarData = [
-            '正月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'
-        ];
-        
-        const lunarDays = [
-            '初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十',
-            '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十',
-            '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'
-        ];
-        
-        const lunarYears = [
-            '甲子', '乙丑', '丙寅', '丁卯', '戊辰', '己巳', '庚午', '辛未', '壬申', '癸酉',
-            '甲戌', '乙亥', '丙子', '丁丑', '戊寅', '己卯', '庚辰', '辛巳', '壬午', '癸未',
-            '甲申', '乙酉', '丙戌', '丁亥', '戊子', '己丑', '庚寅', '辛卯', '壬辰', '癸巳',
-            '甲午', '乙未', '丙申', '丁酉', '戊戌', '己亥', '庚子', '辛丑', '壬寅', '癸卯',
-            '甲辰', '乙巳', '丙午', '丁未', '戊申', '己酉', '庚戌', '辛亥', '壬子', '癸丑',
-            '甲寅', '乙卯', '丙辰', '丁巳', '戊午', '己未', '庚申', '辛酉', '壬戌', '癸亥'
-        ];
-        
-        // 获取农历日期
-        function getLunarDate(date) {
-            const year = date.getFullYear();
-            const month = date.getMonth() + 1;
-            const day = date.getDate();
-            
-            // 计算农历年份（简单实现，实际应使用专业农历算法）
-            const yearIndex = (year - 1984) % 60;
-            const lunarYear = lunarYears[yearIndex];
-            
-            // 获取农历月份和日期
-            const lunarMonth = lunarData[month - 1];
-            const lunarDay = lunarDays[day - 1] || '初一';
-            
-            return `${lunarYear}年 ${lunarMonth}${lunarDay}`;
-        }
         
         // 更新时间显示
         function updateTime() {
@@ -285,8 +249,11 @@
             document.getElementById('dateHeader').textContent = 
                 `${year}年${month.toString().padStart(2, '0')}月${date.toString().padStart(2, '0')}日 ${weekDaysCN[dayOfWeek]} | ${weekDaysEN[dayOfWeek]}`;
             
-            // 更新农历日期
-            document.getElementById('lunarDate').textContent = getLunarDate(now);
+            // 更新底部日期格式
+            document.getElementById('yearLabel').textContent = year;
+            document.getElementById('monthLabel').textContent = month.toString().padStart(2, '0');
+            document.getElementById('dayLabel').textContent = date.toString().padStart(2, '0');
+            document.getElementById('dayOfWeekLabel').textContent = weekDaysCN[dayOfWeek];
             
             // 计算进度
             updateProgress(now);
