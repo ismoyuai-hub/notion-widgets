@@ -7,63 +7,19 @@
 
   <style>
     /* =====================
-       1. 主题变量优化
-       ===================== */
-    :root {
-      /* 默认浅色主题 */
-      --bg: transparent;
-      --card-bg: #ffffff;
-      --text: #37352f;
-      --muted: #9b9a97;
-      --accent: #0d99ff;
-      --border: rgba(55, 53, 47, 0.09);
-      --progress-bg: rgba(55, 53, 47, 0.08);
-    }
-
-    body.theme-dark {
-      --bg: transparent;
-      --card-bg: #2f2f2f;
-      --text: #ffffff;
-      --muted: #b4b4b4;
-      --accent: #4dabf7;
-      --border: rgba(255, 255, 255, 0.13);
-      --progress-bg: rgba(255, 255, 255, 0.1);
-    }
-
-    body.theme-light {
-      --bg: transparent;
-      --card-bg: #ffffff;
-      --text: #37352f;
-      --muted: #9b9a97;
-      --accent: #0d99ff;
-      --border: rgba(55, 53, 47, 0.09);
-      --progress-bg: rgba(55, 53, 47, 0.08);
-    }
-
-    body.theme-glass {
-      --bg: transparent;
-      --card-bg: rgba(255, 255, 255, 0.12);
-      --text: #ffffff;
-      --muted: rgba(255, 255, 255, 0.7);
-      --accent: #4dabf7;
-      --border: rgba(255, 255, 255, 0.15);
-      --progress-bg: rgba(255, 255, 255, 0.1);
-    }
-
-    /* =====================
-       2. 基础布局优化
+       1. 基础样式 - 跟随Notion主题
        ===================== */
     * {
       box-sizing: border-box;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      margin: 0;
+      padding: 0;
     }
 
     html, body {
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+      background: transparent !important;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
       height: 100%;
       width: 100%;
     }
@@ -73,136 +29,184 @@
       justify-content: center;
       align-items: center;
       padding: 12px;
-    }
-
-    .widget {
-      width: 100%;
-      max-width: 320px;
-      padding: 20px 22px;
-      border-radius: 12px;
-      background: var(--card-bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      transition: all 0.2s ease;
+      background: transparent !important;
     }
 
     /* =====================
-       3. 时间显示优化
+       2. 组件容器 - 自动适应Notion主题
+       ===================== */
+    .widget {
+      width: 100%;
+      max-width: 280px;
+      padding: 16px 18px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      
+      /* 浅色主题默认样式 */
+      background: #ffffff;
+      color: #191711;
+      border: 1px solid rgba(25, 23, 17, 0.1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    /* =====================
+       3. 深色主题适配
+       通过Notion传递的theme参数自动应用
+       ===================== */
+    body.dark .widget {
+      background: #2d2d2d;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    /* =====================
+       4. 时间显示
        ===================== */
     .date {
       text-align: center;
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 6px;
+      font-size: 12px;
+      margin-bottom: 4px;
       font-weight: 500;
       letter-spacing: 0.2px;
+      
+      /* 浅色主题 */
+      color: #666666;
+    }
+
+    body.dark .date {
+      color: #b4b4b4;
     }
 
     .time {
       text-align: center;
-      font-size: 36px;
+      font-size: 30px;
       font-weight: 700;
       letter-spacing: -0.5px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       font-variant-numeric: tabular-nums;
       line-height: 1.1;
+      
+      /* 浅色主题 */
+      color: #191711;
+    }
+
+    body.dark .time {
+      color: #ffffff;
     }
 
     /* =====================
-       4. 进度条优化
+       5. 进度条
        ===================== */
     .row {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     .label {
-      width: 60px;
-      font-size: 11px;
-      color: var(--muted);
+      width: 50px;
+      font-size: 10px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
+      
+      /* 浅色主题 */
+      color: #666666;
+    }
+
+    body.dark .label {
+      color: #b4b4b4;
     }
 
     .bar-container {
       flex: 1;
-      height: 6px;
-      background: var(--progress-bg);
-      border-radius: 4px;
+      height: 4px;
+      border-radius: 2px;
       overflow: hidden;
       position: relative;
+      
+      /* 浅色主题 */
+      background: rgba(25, 23, 17, 0.08);
+    }
+
+    body.dark .bar-container {
+      background: rgba(255, 255, 255, 0.1);
     }
 
     .bar {
       display: block;
       height: 100%;
       width: 0%;
-      background: var(--accent);
-      border-radius: 4px;
-      transition: width 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
-      position: relative;
+      border-radius: 2px;
+      transition: width 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+      
+      /* 浅色主题 - 使用Notion蓝色 */
+      background: #0d99ff;
     }
 
-    /* 进度条光泽效果 */
-    .bar::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 50%;
-      background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent);
-      border-radius: 4px 4px 0 0;
+    body.dark .bar {
+      background: #4dabf7;
     }
 
     .percent {
-      width: 40px;
-      font-size: 12px;
+      width: 32px;
+      font-size: 11px;
       text-align: right;
-      color: var(--text);
       font-weight: 600;
       font-variant-numeric: tabular-nums;
+      
+      /* 浅色主题 */
+      color: #191711;
+    }
+
+    body.dark .percent {
+      color: #ffffff;
     }
 
     /* =====================
-       5. 底部信息优化
+       6. 底部信息
        ===================== */
     .footer {
       text-align: center;
-      margin-top: 20px;
-      padding-top: 16px;
-      font-size: 11px;
-      color: var(--muted);
-      border-top: 1px solid var(--border);
+      margin-top: 16px;
+      padding-top: 12px;
+      font-size: 10px;
       font-variant-numeric: tabular-nums;
       letter-spacing: 0.3px;
+      
+      /* 浅色主题 */
+      color: #666666;
+      border-top: 1px solid rgba(25, 23, 17, 0.1);
+    }
+
+    body.dark .footer {
+      color: #b4b4b4;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     /* =====================
-       6. 响应式调整
+       7. 响应式调整
        ===================== */
-    @media (max-width: 380px) {
+    @media (max-width: 350px) {
       .widget {
-        padding: 18px 16px;
-        max-width: 280px;
+        padding: 14px 16px;
+        max-width: 260px;
       }
       
       .time {
-        font-size: 32px;
-        margin-bottom: 20px;
+        font-size: 26px;
+        margin-bottom: 18px;
       }
       
-      .row {
-        margin-bottom: 12px;
+      .date {
+        font-size: 11px;
       }
     }
 
     /* =====================
-       7. 动画效果
+       8. 动画效果
        ===================== */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(4px); }
@@ -210,16 +214,8 @@
     }
 
     .widget {
-      animation: fadeIn 0.4s ease-out;
+      animation: fadeIn 0.3s ease-out;
     }
-
-    .row {
-      animation: fadeIn 0.5s ease-out backwards;
-    }
-
-    .row:nth-child(1) { animation-delay: 0.1s; }
-    .row:nth-child(2) { animation-delay: 0.2s; }
-    .row:nth-child(3) { animation-delay: 0.3s; }
   </style>
 </head>
 
@@ -257,14 +253,25 @@
 
   <script>
     /* =====================
-       1. 主题参数处理
+       1. 主题检测与设置
        ===================== */
+    // 获取URL中的主题参数
     const params = new URLSearchParams(location.search)
-    const theme = params.get('theme') || 'light'
-    document.body.classList.add(`theme-${theme}`)
+    const themeParam = params.get('theme')
+    
+    // 如果URL中指定了主题，使用指定主题
+    // 否则，默认使用浅色主题
+    if (themeParam === 'dark') {
+      document.body.classList.add('dark')
+    } else if (themeParam === 'light') {
+      document.body.classList.remove('dark')
+    } else {
+      // 如果没有指定主题，默认使用浅色
+      document.body.classList.remove('dark')
+    }
 
     /* =====================
-       2. 时间逻辑优化
+       2. 时间逻辑
        ===================== */
     const pad = n => String(n).padStart(2, '0')
     const weekCN = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
@@ -281,15 +288,22 @@
     }
 
     function getWeekNumber(d) {
-      const firstDayOfYear = new Date(d.getFullYear(), 0, 1)
-      const pastDaysOfYear = (d - firstDayOfYear) / 86400000
-      return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7)
+      // 创建一个新的日期对象
+      const target = new Date(d.getTime())
+      // 设置为一周的开始（ISO周从周一开始）
+      const dayNr = (target.getDay() + 6) % 7
+      target.setDate(target.getDate() - dayNr + 3)
+      
+      const firstThursday = new Date(target.getFullYear(), 0, 4)
+      const dayDiff = (target - firstThursday) / 86400000
+      
+      return 1 + Math.ceil(dayDiff / 7)
     }
 
     function update() {
       const now = new Date()
 
-      // 更新时间
+      // 更新时间显示
       document.getElementById('timeText').textContent =
         `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
 
@@ -297,7 +311,8 @@
         `${now.getFullYear()}/${pad(now.getMonth() + 1)}/${pad(now.getDate())} ${weekCN[now.getDay()]}`
 
       // 年进度
-      const isLeapYear = (now.getFullYear() % 4 === 0) && (now.getFullYear() % 100 !== 0 || now.getFullYear() % 400 === 0)
+      const isLeapYear = (now.getFullYear() % 4 === 0) && 
+                        (now.getFullYear() % 100 !== 0 || now.getFullYear() % 400 === 0)
       const yearDays = isLeapYear ? 366 : 365
       const y = dayOfYear(now)
       const yp = Math.round((y / yearDays) * 100)
@@ -322,18 +337,9 @@
         `Year ${y}/${yearDays} · Month ${now.getDate()}/${mDays} · Week ${weekNum}`
     }
 
-    // 初始化
+    // 初始化和定时更新
     update()
-    
-    // 优化更新间隔，减少性能消耗
-    let lastUpdate = Date.now()
-    setInterval(() => {
-      const now = Date.now()
-      if (now - lastUpdate >= 1000) {
-        update()
-        lastUpdate = now
-      }
-    }, 100)
+    setInterval(update, 1000)
 
     // 页面可见性优化
     document.addEventListener('visibilitychange', () => {
