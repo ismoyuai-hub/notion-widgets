@@ -38,12 +38,13 @@
         }
 
         .widget {
-            width: 90%;
-            max-width: 360px;
+            width: 100%;
+            max-width: 380px; /* 限制最大宽度 */
             padding: 20px;
-            /* 移除 border-radius 以更好融入 Notion，或保持微圆角 */
-            border-radius: 4px; 
-            box-sizing: border-box; /* 确保 padding 不撑大容器 */
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         /* 深色模式类 */
@@ -52,60 +53,47 @@
             color: var(--text-dark); 
         }
 
-        .header { text-align: center; margin-bottom: 24px; }
+        /* --- 头部区域 --- */
+        .header { text-align: center; margin-bottom: 24px; transition: margin 0.3s ease; }
         
         #greeting { 
-            font-size: 12px; 
-            font-weight: 600; 
-            text-transform: uppercase; 
-            letter-spacing: 0.05em; 
-            color: var(--muted-light); 
-            margin-bottom: 4px; 
+            font-size: 12px; font-weight: 600; text-transform: uppercase; 
+            letter-spacing: 0.05em; color: var(--muted-light); margin-bottom: 4px;
+            height: 14px; /* 固定高度，防止隐藏时跳动 */
+            opacity: 1; transition: opacity 0.3s;
         }
         body.dark-mode #greeting { color: var(--muted-dark); }
         
         #timeText { 
-            font-size: 42px; /* 稍微调大一点以更醒目 */
-            font-weight: 700; 
-            font-variant-numeric: tabular-nums; 
-            letter-spacing: -0.02em; 
-            line-height: 1.1;
-            margin: 8px 0; 
+            font-size: 42px; font-weight: 750; font-variant-numeric: tabular-nums; 
+            letter-spacing: -0.03em; line-height: 1.1; margin: 4px 0;
+            transition: font-size 0.3s ease;
         }
         
         #dateText { 
-            font-size: 13px; 
-            font-weight: 500; 
-            color: var(--muted-light); 
+            font-size: 13px; font-weight: 500; color: var(--muted-light); 
+            transition: font-size 0.3s ease;
         }
         body.dark-mode #dateText { color: var(--muted-dark); }
 
-        .progress-stack { display: flex; flex-direction: column; gap: 12px; }
+        /* --- 进度条区域 --- */
+        .progress-stack { display: flex; flex-direction: column; gap: 12px; transition: gap 0.3s ease; }
         .bar-group { display: flex; flex-direction: column; gap: 5px; }
         
         .bar-info { 
-            display: flex; 
-            justify-content: space-between; 
-            font-size: 11px; 
-            font-weight: 600; 
-            opacity: 0.9; 
-            letter-spacing: 0.02em;
+            display: flex; justify-content: space-between; align-items: baseline;
+            font-size: 11px; font-weight: 700; opacity: 0.9; letter-spacing: 0.02em;
         }
         
         .bar-track { 
-            height: 8px; 
-            background: var(--bar-bg-light); 
-            border-radius: 4px; 
-            overflow: hidden; 
-            position: relative;
+            height: 8px; background: var(--bar-bg-light); border-radius: 4px; 
+            overflow: hidden; transition: height 0.3s ease;
         }
         body.dark-mode .bar-track { background: var(--bar-bg-dark); }
         
         .bar-fill { 
-            height: 100%; 
-            width: 0%; 
-            border-radius: 4px; 
-            transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); /* 更平滑的动画 */
+            height: 100%; width: 0%; border-radius: 4px; 
+            transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
         }
         
         #fill-year { background: var(--color-year); }
@@ -113,21 +101,52 @@
         #fill-week { background: var(--color-week); }
         #fill-day { background: var(--color-day); }
 
+        /* --- 底部区域 --- */
         .footer { 
-            margin-top: 24px; 
-            font-size: 11px; 
-            text-align: center; 
-            font-weight: 400; 
-            color: var(--muted-light);
-            opacity: 0.8; 
+            margin-top: 24px; font-size: 11px; text-align: center; 
+            font-weight: 400; color: var(--muted-light); opacity: 0.8;
+            transition: margin 0.3s ease, opacity 0.3s ease;
         }
         body.dark-mode .footer { color: var(--muted-dark); }
+
+
+        /* =========================================
+           响应式适配逻辑 (Container Queries Simulation)
+           ========================================= */
+
+        /* 🟢 Level 2: 中等宽度 (例如 Notion 2栏布局) - 宽度小于 340px */
+        @media (max-width: 340px) {
+            .widget { padding: 16px; }
+            #timeText { font-size: 32px; } /* 缩小时间字体 */
+            .header { margin-bottom: 20px; }
+            .progress-stack { gap: 10px; }
+        }
+
+        /* 🔴 Level 3: 极窄宽度 (例如 Notion 3栏布局) - 宽度小于 220px */
+        @media (max-width: 220px) {
+            .widget { padding: 12px 10px; }
+            
+            /* 隐藏次要信息以节省空间 */
+            #greeting { display: none; margin: 0; } 
+            .footer { display: none; }
+            
+            /* 极简布局调整 */
+            .header { margin-bottom: 12px; }
+            #timeText { font-size: 24px; margin: 0; }
+            #dateText { font-size: 11px; margin-top: 2px; }
+            
+            /* 紧凑进度条 */
+            .progress-stack { gap: 8px; }
+            .bar-group { gap: 3px; }
+            .bar-info { font-size: 9px; } /* 缩小标签文字 */
+            .bar-track { height: 6px; }   /* 变细进度条 */
+        }
     </style>
 </head>
 <body class="light-mode">
     <div class="widget">
         <div class="header">
-            <div id="greeting">Wait...</div>
+            <div id="greeting">...</div>
             <div id="timeText">00:00:00</div>
             <div id="dateText">Loading...</div>
         </div>
@@ -151,25 +170,19 @@
             </div>
         </div>
 
-        <div id="footerText" class="footer">Initializing...</div>
+        <div id="footerText" class="footer">Waiting for data...</div>
     </div>
 
     <script>
-        // 1. 自动主题修复逻辑 (支持 URL 参数覆盖 ?theme=dark)
+        // 1. 自动主题修复逻辑
         function applyTheme() {
-            // 优先检查 URL 参数（解决 Notion 有时 iframe 无法继承系统主题的问题）
             const urlParams = new URLSearchParams(window.location.search);
             const forceTheme = urlParams.get('theme');
-            
             let isDark = false;
-            if (forceTheme === 'dark') {
-                isDark = true;
-            } else if (forceTheme === 'light') {
-                isDark = false;
-            } else {
-                // 如果没有 URL 参数，使用系统偏好
-                isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            }
+            
+            if (forceTheme === 'dark') isDark = true;
+            else if (forceTheme === 'light') isDark = false;
+            else isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 
             if (isDark) {
                 document.body.classList.add('dark-mode');
@@ -179,13 +192,10 @@
                 document.body.classList.remove('dark-mode');
             }
         }
-
-        // 监听系统主题变化
         window.matchMedia('(prefers-color-scheme: dark)').addListener(applyTheme);
-        // 初始化运行一次
         applyTheme();
 
-        // 2. 时间计算逻辑 (已修复语法错误)
+        // 2. 核心时间逻辑 (已修复语法和计算问题)
         function isLeapYear(y) { 
             return (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0); 
         }
@@ -200,60 +210,58 @@
                 const mins = now.getMinutes();
                 const secs = now.getSeconds();
 
-                // 动态问候语
+                // 问候语
                 let greet = "GOOD EVENING";
                 if (hrs >= 5 && hrs < 12) greet = "GOOD MORNING";
                 else if (hrs >= 12 && hrs < 18) greet = "GOOD AFTERNOON";
                 document.getElementById('greeting').textContent = greet;
 
-                // 时间文本渲染
+                // 时间文本
                 const pad = (n) => n.toString().padStart(2, '0');
                 const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-                const dayName = dayNames[now.getDay()]; // 修复：通过索引获取具体的一天
+                const dayName = dayNames[now.getDay()]; 
                 
                 document.getElementById('timeText').textContent = `${pad(hrs)}:${pad(mins)}:${pad(secs)}`;
                 document.getElementById('dateText').textContent = `${year}年${pad(month + 1)}月${pad(date)}日 ${dayName}`;
 
-                // 年进度
+                // 进度计算 (精确版)
                 const startOfYear = new Date(year, 0, 1);
-                const daysPassed = Math.floor((now - startOfYear) / 86400000); // 修正为从0开始计算完整过去的天数
+                const daysPassed = Math.floor((now - startOfYear) / 86400000);
                 const totalDaysYear = isLeapYear(year) ? 366 : 365;
-                // 使用当前时间精确计算年进度 (Days + Today's Time)
                 const exactDaysPassed = daysPassed + ((hrs * 3600 + mins * 60 + secs) / 86400);
-                const yearPct = (exactDaysPassed / totalDaysYear) * 100;
                 
+                // Yearly
+                const yearPct = (exactDaysPassed / totalDaysYear) * 100;
                 document.getElementById('fill-year').style.width = yearPct.toFixed(2) + '%';
-                document.getElementById('pct-year').textContent = yearPct.toFixed(1) + '%'; // 保留一位小数更专业
-                document.getElementById('footerText').textContent = `${Math.floor(exactDaysPassed)} / ${totalDaysYear} Days Passed in ${year}`;
+                document.getElementById('pct-year').textContent = yearPct.toFixed(1) + '%';
+                document.getElementById('footerText').textContent = `${Math.floor(exactDaysPassed)} / ${totalDaysYear} Days Passed`;
 
-                // 月进度
+                // Monthly
                 const totalDaysMonth = new Date(year, month + 1, 0).getDate();
-                const monthPct = ((date - 1 + (hrs/24)) / totalDaysMonth) * 100; // 考虑当天时间，更平滑
+                const monthPct = ((date - 1 + (hrs/24 + mins/1440)) / totalDaysMonth) * 100;
                 document.getElementById('fill-month').style.width = monthPct + '%';
                 document.getElementById('pct-month').textContent = Math.round(monthPct) + '%';
 
-                // 周进度 (周一为起始的逻辑修正)
+                // Weekly
                 let dayIdx = now.getDay(); 
-                // getDay() 返回 0(周日)-6(周六)。如果周一为起始，周日应该是7，周一应该是1
                 let dayIdxForCalc = dayIdx === 0 ? 7 : dayIdx; 
-                // 计算当前是本周的第几天（含时间）
                 const weekProgressDays = (dayIdxForCalc - 1) + ((hrs * 3600 + mins * 60 + secs) / 86400);
                 const weekPct = (weekProgressDays / 7) * 100;
-                
                 document.getElementById('fill-week').style.width = weekPct + '%';
                 document.getElementById('pct-week').textContent = Math.round(weekPct) + '%';
 
-                // 日进度
+                // Daily
                 const dayPct = ((hrs * 3600 + mins * 60 + secs) / 86400) * 100;
                 document.getElementById('fill-day').style.width = dayPct + '%';
                 document.getElementById('pct-day').textContent = Math.round(dayPct) + '%';
+
             } catch (e) {
                 console.error("Widget Update Error:", e);
             }
         }
 
         setInterval(update, 1000);
-        update(); // 立即运行一次，避免1秒延迟
+        update();
     </script>
 </body>
 </html>
