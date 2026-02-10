@@ -1,226 +1,221 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Notion 时间组件</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notion Optimized Time Widget</title>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <style>
+        :root {
+            /* 浅色模式标记 - 基于 Notion 调色盘  */
+            --bg: transparent;
+            --card-bg: #ffffff;
+            --text-main: #373530;
+            --text-muted: #787774;
+            --bar-bg: #f1f1ef;
+            --accent-year: #2eaadc;
+            --accent-month: #448361;
+            --accent-week: #d9730d;
+            --radius: 4px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
 
-  <style>
-    /* =====================
-       1. 主题变量（默认 glass）
-       ===================== */
-    :root {
-      --bg: transparent;
-      --card-bg: transparent;
-      --text: #111;
-      --muted: #777;
-      --accent: #00a884;
-    }
+        /* 自动检测并匹配系统深色模式  */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --card-bg: #191919;
+                --text-main: #d4d4d4;
+                --text-muted: #9b9b9b;
+                --bar-bg: #252525;
+                --accent-year: #447acb;
+                --accent-month: #4f9768;
+                --accent-week: #cb7b37;
+                --shadow: 0 1px 3px rgba(0,0,0,0.3);
+            }
+        }
 
-    body.theme-dark {
-      --bg: transparent;
-      --card-bg: transparent;
-      --text: #f5f6f7;
-      --muted: #9aa0a6;
-      --accent: #00d0a3;
-    }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+        }
 
-    body.theme-light {
-      --bg: transparent;
-      --card-bg: transparent;
-      --text: #111;
-      --muted: #666;
-      --accent: #00a884;
-    }
+       .widget {
+            padding: 24px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 85%;
+            max-width: 400px;
+            transition: all 0.3s ease;
+        }
 
-    body.theme-glass {
-      --bg: transparent;
-      --card-bg: rgba(255,255,255,0.06);
-      --text: #f5f6f7;
-      --muted: #b0b6bb;
-      --accent: #00d0a3;
-    }
+       .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
 
-    /* =====================
-       2. 基础布局
-       ===================== */
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto;
-    }
+        #dateText {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
 
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 12px;
-    }
+        #timeText {
+            font-size: 36px;
+            font-weight: 700;
+            /* 开启等宽数字，防止秒数跳动偏移 [1] */
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.04em;
+        }
 
-    .widget {
-      width: 100%;
-      max-width: 320px;
-      padding: 20px;
-      border-radius: 14px;
-      background: var(--card-bg);
-      color: var(--text);
-      backdrop-filter: blur(10px);
-    }
+       .progress-section {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
 
-    /* =====================
-       3. 时间显示
-       ===================== */
-    .date {
-      text-align: center;
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
+       .row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
-    .time {
-      text-align: center;
-      font-size: 44px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      margin-bottom: 18px;
-    }
+       .row-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
 
-    /* =====================
-       4. 进度条
-       ===================== */
-    .row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
+       .bar-container {
+            height: 10px;
+            background: var(--bar-bg);
+            border-radius: 5px;
+            overflow: hidden;
+        }
 
-    .label {
-      width: 56px;
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 600;
-    }
+       .bar-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-    .bar {
-      flex: 1;
-      height: 8px;
-      background: rgba(127,127,127,0.2);
-      border-radius: 999px;
-      overflow: hidden;
-    }
+        #yearBar { background: var(--accent-year); }
+        #monthBar { background: var(--accent-month); }
+        #weekBar { background: var(--accent-week); }
 
-    .bar > span {
-      display: block;
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg,var(--accent),#00c2ff);
-      border-radius: 999px;
-      transition: width .6s ease;
-    }
-
-    .percent {
-      width: 42px;
-      font-size: 12px;
-      text-align: right;
-      color: var(--muted);
-      font-weight: 600;
-    }
-
-    /* =====================
-       5. 底部
-       ===================== */
-    .footer {
-      text-align: center;
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-  </style>
+       .footer {
+            margin-top: 24px;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
+            font-weight: 500;
+        }
+    </style>
 </head>
-
 <body>
-  <div class="widget">
-    <div class="date" id="dateText">--</div>
-    <div class="time" id="timeText">--:--:--</div>
-
-    <div class="row">
-      <div class="label">YEAR</div>
-      <div class="bar"><span id="yearBar"></span></div>
-      <div class="percent" id="yearPct">--%</div>
+    <div class="widget">
+        <div class="header">
+            <div id="dateText">加载中...</div>
+            <div id="timeText">00:00:00</div>
+        </div>
+        
+        <div class="progress-section">
+            <div class="row">
+                <div class="row-info">
+                    <span>Year</span>
+                    <span id="yearPct">0%</span>
+                </div>
+                <div class="bar-container">
+                    <div id="yearBar" class="bar-fill" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="row-info">
+                    <span>Month</span>
+                    <span id="monthPct">0%</span>
+                </div>
+                <div class="bar-container">
+                    <div id="monthBar" class="bar-fill" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="row-info">
+                    <span>Week</span>
+                    <span id="weekPct">0%</span>
+                </div>
+                <div class="bar-container">
+                    <div id="weekBar" class="bar-fill" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="footerText" class="footer">0 / 0 Days Passed</div>
     </div>
 
-    <div class="row">
-      <div class="label">MONTH</div>
-      <div class="bar"><span id="monthBar"></span></div>
-      <div class="percent" id="monthPct">--%</div>
-    </div>
+    <script>
+        function isLeapYear(year) {
+            return (year % 4 === 0 && year % 100!== 0) |
 
-    <div class="row">
-      <div class="label">WEEK</div>
-      <div class="bar"><span id="weekBar"></span></div>
-      <div class="percent" id="weekPct">--%</div>
-    </div>
+| (year % 400 === 0);
+        }
 
-    <div class="footer" id="footerText">--</div>
-  </div>
+        function getDaysInMonth(year, month) {
+            return new Date(year, month + 1, 0).getDate();
+        }
 
-  <script>
-    /* =====================
-       1. 主题参数（核心）
-       ===================== */
-    const params = new URLSearchParams(location.search)
-    const theme = params.get('theme') || 'glass'
-    document.body.classList.add(`theme-${theme}`)
+        function update() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const date = now.getDate();
+            // 设定周进度，将周一设为第一天 
+            const day = now.getDay() === 0? 7 : now.getDay(); 
 
-    /* =====================
-       2. 时间逻辑
-       ===================== */
-    const pad = n => String(n).padStart(2,'0')
-    const weekCN = ['周日','周一','周二','周三','周四','周五','周六']
+            // 时间显示逻辑
+            const pad = (n) => n.toString().padStart(2, '0');
+            const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            document.getElementById('dateText').textContent = `${year}年${month + 1}月${date}日 ${dayNames}`;
+            document.getElementById('timeText').textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
-    function dayOfYear(d){
-      const start = new Date(d.getFullYear(),0,0)
-      return Math.floor((d-start)/(1000*60*60*24))
-    }
+            // 年进度逻辑 [9, 10]
+            const startOfYear = new Date(year, 0, 1);
+            const daysPassed = Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000)) + 1;
+            const totalDaysInYear = isLeapYear(year)? 366 : 365;
+            const yearPct = (daysPassed / totalDaysInYear) * 100;
+            document.getElementById('yearBar').style.width = yearPct + '%';
+            document.getElementById('yearPct').textContent = Math.round(yearPct) + '%';
+            document.getElementById('footerText').textContent = `${daysPassed} / ${totalDaysInYear} Days (Yearly Progress)`;
 
-    function update(){
-      const now = new Date()
+            // 月进度逻辑 [11]
+            const daysInMonth = getDaysInMonth(year, month);
+            const monthPct = (date / daysInMonth) * 100;
+            document.getElementById('monthBar').style.width = monthPct + '%';
+            document.getElementById('monthPct').textContent = Math.round(monthPct) + '%';
 
-      // 时间
-      document.getElementById('timeText').textContent =
-        `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
+            // 周进度逻辑
+            const weekPct = (day / 7) * 100;
+            document.getElementById('weekBar').style.width = weekPct + '%';
+            document.getElementById('weekPct').textContent = Math.round(weekPct) + '%';
+        }
 
-      document.getElementById('dateText').textContent =
-        `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${weekCN[now.getDay()]}`
-
-      // 年
-      const yearDays = ((now.getFullYear()%4===0)&& (now.getFullYear()%100!==0)) ? 366 : 365
-      const y = dayOfYear(now)
-      const yp = Math.round(y / yearDays * 100)
-      yearBar.style.width = yp + '%'
-      yearPct.textContent = yp + '%'
-
-      // 月
-      const mDays = new Date(now.getFullYear(),now.getMonth()+1,0).getDate()
-      const mp = Math.round(now.getDate()/mDays*100)
-      monthBar.style.width = mp + '%'
-      monthPct.textContent = mp + '%'
-
-      // 周（周一开始）
-      const wd = now.getDay() === 0 ? 7 : now.getDay()
-      const wp = Math.round(wd/7*100)
-      weekBar.style.width = wp + '%'
-      weekPct.textContent = wp + '%'
-
-      document.getElementById('footerText').textContent =
-        `${y}/${yearDays} · ${now.getDate()}/${mDays} · ${wd}/7`
-    }
-
-    update()
-    setInterval(update,1000)
-  </script>
+        // 启动每秒更新
+        setInterval(update, 1000);
+        update();
+    </script>
 </body>
 </html>
